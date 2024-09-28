@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quiz : Démarche Marketing & Définition des Marchés</title>
+    <style>
+        body {
+            font-family: 'Mayan', sans-serif;
+            margin: 0;
+            background-size: cover;
+            background-attachment: fixed;
+            background-position: center;
+            background-repeat: no-repeat;
+            color: #333;
+            text-align: center;
+        }
+        .quiz-container, .summary {
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background-color: rgba(255, 255, 255, 0.8);
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            position: relative;
+            background-image: url('images/back.jpg.webp');
+            background-size: cover;
+            background-position: center;
+        }
+        .question {
+            font-size: 18px;
+            margin-bottom: 10px;
+            font-weight: bold;
+            color: #000;
+        }
+        .choices {
+            list-style: none;
+            padding: 0;
+            text-align: left;
+            margin-left: 20%;
+        }
+        .choices li {
+            margin: 8px 0;
+        }
+        button {
+            margin-top: 20px;
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            border: none;
+            background-color: #FF0000;
+            color: white;
+            border-radius: 10px;
+            transition: background-color 0.3s;
+        }
+        button:hover {
+            background-color: #CC0000;
+        }
+        .summary {
+            display: none;
+        }
+        .summary ul {
+            list-style: none;
+            padding: 0;
+        }
+        .summary li {
+            text-align: left;
+            margin-left: 20%;
+            margin-bottom: 10px;
+        }
+        .correct {
+            color: green;
+            font-weight: bold;
+        }
+        .incorrect {
+            color: red;
+            font-weight: bold;
+        }
+        .score {
+            margin-top: 20px;
+            font-size: 18px;
+            font-weight: bold;
+        }
+        @media (max-width: 768px) {
+            .quiz-container, .summary {
+                max-width: 90%;
+                margin: 20px auto;
+                padding: 15px;
+                border-radius: 10px;
+            }
+            button {
+                font-size: 14px;
+                padding: 8px 16px;
+            }
+        }
+        @media (max-width: 480px) {
+            .quiz-container, .summary {
+                padding: 10px;
+                margin: 10px;
+                border-radius: 10px;
+            }
+            .question {
+                font-size: 16px;
+            }
+            button {
+                font-size: 12px;
+                padding: 6px 12px;
+                border-radius: 10px;
+            }
+        }
+        @media (min-width: 1024px) {
+            .quiz-container, .summary {
+                max-width: 800px;
+                padding: 30px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="quiz-container" id="quiz-container">
+    <h2>QCM ENTRAINEMENT - Capital Asset Pricing Model (CAPM) and Risk</h2>
+    <div id="question-container">
+        <!-- Les questions seront affichées ici dynamiquement -->
+    </div>
+    <button id="next-button" onclick="nextQuestion()">Suivant</button>
+</div>
+
+<div class="summary" id="summary">
+    <h3>Récapitulatif</h3>
+    <ul id="summary-list">
+        <!-- Le récapitulatif des réponses sera affiché ici -->
+    </ul>
+    <div class="score" id="score"></div>
+    <button onclick="restartQuiz()">Recommencer</button>
+</div>
+
+<script>
+    const quizData = [
+        { question: "What is the Capital Market Line (CML)?", choices: ["A line representing portfolios of only risky assets.", "A line showing the trade-off between risk and return for efficient portfolios, including the risk-free asset.", "A measure of the risk of a single asset.", "A line showing the highest risk achievable in a market."], correct: 1 },
+        { question: "Why does the CML slope equal the slope of the Efficient Frontier at the market portfolio?", choices: ["The CML is parallel to the Efficient Frontier at all points.", "The CML is tangent to the Efficient Frontier at the market portfolio, representing the highest Sharpe ratio.", "The market portfolio has no systematic risk.", "The CML does not relate to the Efficient Frontier."], correct: 1 },
+        { question: "What is the expected return of an asset according to the CAPM theorem?", choices: ["Expected return = Risk-free rate + Beta × Risk-free rate", "Expected return = Risk-free rate + Beta × Market risk premium", "Expected return = Risk-free rate – Beta × Market risk premium", "Expected return = Beta × (Risk-free rate – Market risk premium)"], correct: 1 },
+        { question: "What does Beta measure in the CAPM model?", choices: ["The total risk of an asset", "The systematic risk or sensitivity of an asset to market movements", "The unsystematic risk of a portfolio", "The variance of returns in a portfolio"], correct: 1 },
+        { question: "Which of the following is not true about Beta in CAPM?", choices: ["A negative beta indicates the asset moves inversely to the market and is valuable as a hedge.", "A beta of 1 means the asset has the same risk as the market portfolio.", "A beta greater than 1 indicates the asset is less risky than the market portfolio.", "A beta of 0 means the asset has no systematic risk."], correct: 2 },
+        { question: "What risk does CAPM assume investors will be compensated for?", choices: ["Unsystematic risk", "Total portfolio risk", "Market (systematic) risk", "Liquidity risk"], correct: 2 },
+        { question: "What is the market risk premium in the CAPM?", choices: ["The return on a risk-free asset minus the market return", "The additional return investors expect for holding market risk instead of a risk-free asset", "The difference between the highest and lowest returns in a portfolio", "The premium paid by investors for diversifying risk"], correct: 1 },
+        { question: "Which formula represents the CAPM expected return for a portfolio?", choices: ["Expected return = (1 + Risk-free rate) × Portfolio beta", "Expected return = Risk-free rate + (Portfolio beta × Market risk premium)", "Expected return = Portfolio beta × (Risk-free rate + Expected market return)", "Expected return = (Portfolio beta × Market risk premium) – Risk-free rate"], correct: 1 },
+        { question: "What assumption does CAPM make about investors?", choices: ["Investors hold undiversified portfolios.", "Investors are compensated for both systematic and unsystematic risks.", "Investors hold well-diversified portfolios to eliminate unsystematic risk.", "Investors are only concerned with minimizing beta."], correct: 2 },
+        { question: "Which of the following is not a property of the CAPM model?", choices: ["The relationship between expected return and beta is linear.", "Only systematic risk is rewarded in the market.", "The market portfolio contains all risky assets.", "CAPM compensates investors for holding unsystematic risk."], correct: 3 }
+    ];
+
+    let currentQuestionIndex = 0;
+    let selectedAnswers = [];
+
+    function loadQuestion() {
+        const container = document.getElementById('question-container');
+        container.innerHTML = '';
+
+        const questionData = quizData[currentQuestionIndex];
+        const questionElem = document.createElement('div');
+        questionElem.className = 'question';
+        questionElem.textContent = questionData.question;
+
+        const choicesElem = document.createElement('ul');
+        choicesElem.className = 'choices';
+
+        questionData.choices.forEach((choice, index) => {
+            const choiceElem = document.createElement('li');
+            const choiceInput = document.createElement('input');
+            choiceInput.type = 'radio';
+            choiceInput.name = 'choice';
+            choiceInput.value = index;
+            choiceInput.id = `choice${index}`;
+            
+            const choiceLabel = document.createElement('label');
+            choiceLabel.htmlFor = `choice${index}`;
+            choiceLabel.textContent = choice;
+
+            choiceElem.appendChild(choiceInput);
+            choiceElem.appendChild(choiceLabel);
+            choicesElem.appendChild(choiceElem);
+        });
+
+        container.appendChild(questionElem);
+        container.appendChild(choicesElem);
+    }
+
+    function nextQuestion() {
+        const selectedChoice = document.querySelector('input[name="choice"]:checked');
+        if (!selectedChoice) {
+            alert("Veuillez sélectionner une réponse !");
+            return;
+        }
+
+        selectedAnswers.push(parseInt(selectedChoice.value));
+        currentQuestionIndex++;
+
+        if (currentQuestionIndex < quizData.length) {
+            loadQuestion();
+        } else {
+            showSummary();
+        }
+    }
+
+    function showSummary() {
+        document.getElementById('quiz-container').style.display = 'none';
+        const summary = document.getElementById('summary');
+        summary.style.display = 'block';
+
+        const summaryList = document.getElementById('summary-list');
+        summaryList.innerHTML = '';
+
+        let correctAnswers = 0;
+
+        quizData.forEach((q, index) => {
+            const summaryItem = document.createElement('li');
+            summaryItem.innerHTML = `
+                <strong>${q.question}</strong><br>
+                <div style="text-align: left; margin-left: 20%;">
+                    Votre réponse: ${q.choices[selectedAnswers[index]]} - 
+                    ${selectedAnswers[index] === q.correct ? '<span class="correct">Correct</span>' : '<span class="incorrect">Incorrect</span>'}<br>
+                    Bonne réponse: ${q.choices[q.correct]}
+                </div>
+            `;
+            summaryList.appendChild(summaryItem);
+            if (selectedAnswers[index] === q.correct) {
+                correctAnswers++;
+            }
+        });
+
+        document.getElementById('score').textContent = `Score: ${correctAnswers} / ${quizData.length}`;
+    }
+
+    function restartQuiz() {
+        currentQuestionIndex = 0;
+        selectedAnswers = [];
+        document.getElementById('summary').style.display = 'none';
+        document.getElementById('quiz-container').style.display = 'block';
+        loadQuestion();
+    }
+
+    loadQuestion();
+</script>
+
+</body>
+
+
+
+
+</html>
